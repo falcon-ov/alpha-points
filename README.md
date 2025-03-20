@@ -44,7 +44,7 @@
 ## Сборка в `.exe`
 Для создания исполняемого файла:
 ```bash
-pyinstaller --onefile script.py
+pyinstaller --onefile main.py
 ```
 - Готовый файл будет в папке `dist`.
 
