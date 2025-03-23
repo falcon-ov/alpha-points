@@ -114,59 +114,75 @@ class PointsAdderApp:
         # Инициализация основного окна приложения
         self.root = root
         self.root.title("Добавление баллов ученикам")
-        self.root.geometry("575x650")  # Установлен размер окна 575x650
+        self.root.geometry("575x650")
+        self.root.configure(bg="#e8ecef")  # Мягкий серо-голубой фон
 
-        # Поле ввода URL группы с подсказкой про Ctrl+V
-        tk.Label(root, text="URL страницы со списком учеников:\n(Ctrl+V работает на англ. раскладке)").grid(row=0, column=0, padx=5, pady=5)
-        self.url_entry = tk.Entry(root, width=50)
-        self.url_entry.grid(row=0, column=1, padx=5, pady=5)
+        # Поле ввода URL группы
+        tk.Label(root, text="URL страницы со списком учеников:\n(Ctrl+V работает на англ. раскладке)",
+                 bg="#e8ecef", fg="#000000", font=("Helvetica", 10, "bold")).grid(row=0, column=0, padx=10, pady=5,
+                                                                                  sticky="w")
+        self.url_entry = tk.Entry(root, width=50, bg="white", fg="#000000", relief="flat",
+                                  highlightthickness=1, highlightbackground="#cbd5e0")
+        self.url_entry.grid(row=0, column=1, padx=10, pady=5)
 
-        # Поле ввода даты с форматом
-        tk.Label(root, text="Дата (дд.мм.гггг, по умолчанию сегодня):").grid(row=1, column=0, padx=5, pady=5)
-        self.date_entry = tk.Entry(root)
-        self.date_entry.grid(row=1, column=1, padx=5, pady=5)
+        # Поле ввода даты
+        tk.Label(root, text="Дата (дд.мм.гггг, по умолчанию сегодня):",
+                 bg="#e8ecef", fg="#000000", font=("Helvetica", 10, "bold")).grid(row=1, column=0, padx=10, pady=5,
+                                                                                  sticky="w")
+        self.date_entry = tk.Entry(root, bg="white", fg="#000000", relief="flat",
+                                   highlightthickness=1, highlightbackground="#cbd5e0")
+        self.date_entry.grid(row=1, column=1, padx=10, pady=5)
 
-        # Выпадающий список предметов
-        tk.Label(root, text="Предмет:").grid(row=2, column=0, padx=5, pady=5)
+        # Выпадающий список предметов с текстом "(по умолчанию с сайта)"
+        tk.Label(root, text="Предмет (по умолчанию с сайта):",
+                 bg="#e8ecef", fg="#000000", font=("Helvetica", 10, "bold")).grid(row=2, column=0, padx=10, pady=5,
+                                                                                  sticky="w")
         self.subject_combobox = ttk.Combobox(root, values=list(subjects.values()), width=47)
-        self.subject_combobox.grid(row=2, column=1, padx=5, pady=5)
+        self.subject_combobox.grid(row=2, column=1, padx=10, pady=5)
         self.subject_combobox.set("Выберите предмет")
+        self.subject_combobox.configure(foreground="#4a5568")
 
-        # Кнопка для открытия Alpha (календаря)
-        self.alpha_button = tk.Button(root, text="Alpha", command=self.open_alpha, width=10)
-        self.alpha_button.grid(row=3, column=0, pady=5)
+        # Кнопки
+        button_frame = tk.Frame(root, bg="#e8ecef")
+        button_frame.grid(row=3, column=0, columnspan=2, pady=10)
 
-        # Кнопка запуска процесса добавления баллов (изначально отключена)
-        self.start_button = tk.Button(root, text="Запустить", command=self.start_process, state="disabled")
-        self.start_button.grid(row=3, column=1, pady=10, sticky="w")
+        self.alpha_button = tk.Button(button_frame, text="Alpha", command=self.open_alpha, width=10,
+                                      bg="#f7fafc", fg="#000000", relief="flat", font=("Helvetica", 10, "bold"),
+                                      activebackground="#e2e8f0")
+        self.alpha_button.pack(side="left", padx=5)
 
-        # Кнопка получения данных студентов с сайта
-        self.get_data_button = tk.Button(root, text="Получить данные", command=self.get_students_data)
-        self.get_data_button.grid(row=3, column=1, pady=10, sticky="e")
+        self.start_button = tk.Button(button_frame, text="Запустить", command=self.start_process, state="disabled",
+                                      bg="#f7fafc", fg="#000000", relief="flat", font=("Helvetica", 10, "bold"),
+                                      activebackground="#e2e8f0")
+        self.start_button.pack(side="left", padx=5)
+
+        self.get_data_button = tk.Button(button_frame, text="Получить данные", command=self.get_students_data,
+                                         bg="#f7fafc", fg="#000000", relief="flat", font=("Helvetica", 10, "bold"),
+                                         activebackground="#e2e8f0")
+        self.get_data_button.pack(side="right", padx=5)
 
         # Текст инструкции для пользователя
         instructions_text = (
             "Как пользоваться программой:\n"
-            "1. Нажмите кнопку 'Alpha', чтобы открыть Microsoft Edge и перейти на страницу календаря Alpha "
-            "(https://impactacademies.s20.online/teacher/1/calendar/index). Войдите в свой аккаунт, если требуется.\n"
-            "2. Введите URL страницы с группой студентов (например, страницу со списком учеников из Alpha).\n"
-            "3. Укажите дату в формате дд.мм.гггг (или оставьте пустым — будет использована сегодняшняя дата).\n"
-            "4. Выберите предмет из выпадающего списка.\n"
-            "5. Нажмите 'Получить данные' — программа откроет указанный URL и загрузит список студентов.\n"
-            "6. В появившемся списке отметьте галочками студентов, которым хотите выставить баллы.\n"
-            "7. Для каждого отмеченного студента укажите баллы (по умолчанию 75% студентов получат 4, 25% — 5) "
-            "и примечание (если нужно).\n"
-            "8. Нажмите 'Запустить' — баллы и примечания будут добавлены выбранным студентам в Alpha."
+            "1. Нажмите кнопку 'Alpha', чтобы открыть Microsoft Edge и перейти на страницу календаря Alpha.\n"
+            "2. Введите URL страницы с группой студентов.\n"
+            "3. Укажите дату в формате дд.мм.гггг (или оставьте пустым).\n"
+            "4. Выберите предмет (по умолчанию берется с сайта).\n"
+            "5. Нажмите 'Получить данные' для загрузки списка студентов.\n"
+            "6. Отметьте студентов, укажите баллы и примечания.\n"
+            "7. Нажмите 'Запустить' для добавления баллов."
         )
-        instructions_label = tk.Label(root, text=instructions_text, justify=tk.LEFT, wraplength=550)
-        instructions_label.grid(row=5, column=0, columnspan=2, padx=5, pady=5)
+        instructions_label = tk.Label(root, text=instructions_text, justify=tk.LEFT, wraplength=550,
+                                      bg="#e8ecef", fg="#000000", font=("Helvetica", 9))
+        instructions_label.grid(row=5, column=0, columnspan=2, padx=10, pady=5)
 
         # Область для списка студентов с прокруткой
-        self.students_frame = tk.Frame(root)
-        self.students_frame.grid(row=4, column=0, columnspan=2, padx=5, pady=5, sticky="nsew")
-        self.canvas = tk.Canvas(self.students_frame)
-        self.scrollbar = tk.Scrollbar(self.students_frame, orient="vertical", command=self.canvas.yview)
-        self.scrollable_frame = tk.Frame(self.canvas)
+        self.students_frame = tk.Frame(root, bg="white", bd=1, relief="solid")
+        self.students_frame.grid(row=4, column=0, columnspan=2, padx=10, pady=5, sticky="nsew")
+        self.canvas = tk.Canvas(self.students_frame, bg="white")
+        self.scrollbar = tk.Scrollbar(self.students_frame, orient="vertical", command=self.canvas.yview,
+                                      bg="#e2e8f0", troughcolor="#edf2f7")
+        self.scrollable_frame = tk.Frame(self.canvas, bg="white")
 
         self.scrollable_frame.bind(
             "<Configure>",
@@ -179,35 +195,33 @@ class PointsAdderApp:
         self.scrollbar.pack(side="right", fill="y")
 
         # Словари для хранения данных студентов
-        self.student_vars = {}  # Чекбоксы (выбран/не выбран)
-        self.student_urls = {}  # URL карточек студентов
-        self.student_points = {}  # Поля ввода баллов
-        self.student_comments = {}  # Поля ввода примечаний
+        self.student_vars = {}
+        self.student_urls = {}
+        self.student_points = {}
+        self.student_comments = {}
+
+        # Настройка веса строк и столбцов для адаптивности
+        root.grid_rowconfigure(4, weight=1)
+        root.grid_columnconfigure(1, weight=1)
 
     def get_subject_code(self, subject_name):
-        """Получает код предмета по его названию из словаря subjects."""
         for code, name in subjects.items():
             if name == subject_name:
                 return code
         return None
 
     def close_edge_processes(self):
-        """Закрывает все процессы Microsoft Edge для предотвращения конфликтов."""
         for proc in psutil.process_iter(['name']):
             if proc.info['name'] == 'msedge.exe':
                 try:
                     proc.terminate()
-                    try:
-                        proc.wait(timeout=3)  # Даём 3 секунды на завершение
-                    except psutil.TimeoutExpired:
-                        proc.kill()  # Принудительно завершаем, если не закрылся
-                except psutil.NoSuchProcess:
-                    pass  # Процесс уже завершён
-                except Exception as e:
-                    messagebox.showwarning("Предупреждение", f"Ошибка при закрытии Edge: {str(e)}")
+                    proc.wait(timeout=3)
+                except psutil.TimeoutExpired:
+                    proc.kill()
+                except:
+                    pass
 
     def open_alpha(self):
-        """Открывает Edge на странице календаря Alpha для авторизации."""
         edge_path = "C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe"
         try:
             self.close_edge_processes()
@@ -217,7 +231,6 @@ class PointsAdderApp:
             messagebox.showerror("Ошибка", f"Не удалось открыть Edge: {str(e)}")
 
     def ensure_edge_running(self, url):
-        """Проверяет, запущен ли Edge с портом 9222, и запускает его, если нет."""
         edge_path = "C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe"
         edge_running = False
         for proc in psutil.process_iter(['name', 'cmdline']):
@@ -235,7 +248,6 @@ class PointsAdderApp:
         return True
 
     def get_students_data(self):
-        """Загружает список студентов с указанного URL и отображает их в интерфейсе."""
         url = self.url_entry.get()
         if not url:
             messagebox.showerror("Ошибка", "Введите URL страницы со списком учеников!")
@@ -244,7 +256,6 @@ class PointsAdderApp:
         if not self.ensure_edge_running(url):
             return
 
-        # Очистка предыдущих данных студентов
         for widget in self.scrollable_frame.winfo_children():
             widget.destroy()
         self.student_vars.clear()
@@ -252,97 +263,6 @@ class PointsAdderApp:
         self.student_points.clear()
         self.student_comments.clear()
 
-        # Настройка Selenium для подключения к существующему Edge
-        edge_options = Options()
-        edge_options.add_experimental_option("debuggerAddress", "127.0.0.1:9222")
-        try:
-            driver = webdriver.Edge(service=webdriver.edge.service.Service(EdgeChromiumDriverManager().install()), options=edge_options)
-        except Exception as e:
-            messagebox.showerror("Ошибка", f"Не удалось подключиться к Edge: {str(e)}\nПроверьте установку Edge и интернет-соединение.")
-            return
-
-        try:
-            driver.get(url)
-            # Ожидание загрузки списка студентов (максимум 3 секунды)
-            WebDriverWait(driver, 3).until(
-                EC.presence_of_element_located((By.CLASS_NAME, "list-unstyled"))
-            )
-
-            # Поиск всех студентов на странице (не архивных)
-            students = driver.find_elements(By.XPATH,
-                                           "//ul[@class='list-unstyled m-t-xs m-b-xs']/li[not(contains(@class, 'archive'))]/a[@title='Открыть карточку']")
-            for i, student in enumerate(students):
-                student_name = student.text.strip()
-                student_url = student.get_attribute("href")
-                if student_name and student_url:
-                    # Добавление чекбокса для выбора студента
-                    var = tk.BooleanVar()
-                    cb = tk.Checkbutton(self.scrollable_frame, text=student_name, variable=var)
-                    cb.grid(row=i, column=0, sticky="w", padx=5, pady=2)
-
-                    # Поле для баллов с случайным значением (75% - 4, 25% - 5)
-                    points_default = random.choices(["4", "5"], weights=[3, 1], k=1)[0]
-                    points_entry = tk.Entry(self.scrollable_frame, width=5)
-                    points_entry.insert(0, points_default)
-                    points_entry.grid(row=i, column=1, padx=5, pady=2)
-
-                    # Поле для примечания
-                    comment_entry = tk.Entry(self.scrollable_frame, width=30)
-                    comment_entry.grid(row=i, column=2, padx=5, pady=2)
-
-                    # Сохранение данных в словари
-                    self.student_vars[student_name] = var
-                    self.student_urls[student_name] = student_url
-                    self.student_points[student_name] = points_entry
-                    self.student_comments[student_name] = comment_entry
-
-            if not self.student_vars:
-                messagebox.showwarning("Предупреждение", "Студенты не найдены на указанной странице.")
-            else:
-                self.start_button.config(state="normal")  # Активация кнопки "Запустить"
-                messagebox.showinfo("Успех", "Список студентов загружен. Укажите баллы и примечания, затем нажмите 'Запустить'.")
-
-        except Exception as e:
-            messagebox.showerror("Ошибка", f"Не удалось загрузить данные: {str(e)}")
-        finally:
-            pass  # Браузер остаётся открытым для дальнейшей работы
-
-    def start_process(self):
-        """Запускает процесс добавления баллов выбранным студентам."""
-        url = self.url_entry.get()
-        date = self.date_entry.get() or datetime.now().strftime("%d.%m.%Y")  # Текущая дата, если поле пустое
-        subject_name = self.subject_combobox.get()
-        subject = self.get_subject_code(subject_name)
-
-        # Проверка обязательных полей
-        if not url or not subject or subject_name == "Выберите предмет":
-            messagebox.showerror("Ошибка", "Введите URL и выберите предмет!")
-            return
-
-        # Получение списка выбранных студентов
-        selected_students = [name for name, var in self.student_vars.items() if var.get()]
-        if not selected_students:
-            messagebox.showerror("Ошибка", "Выберите хотя бы одного студента!")
-            return
-
-        # Перезапуск Edge с указанным URL
-        self.close_edge_processes()
-        edge_path = "C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe"
-        try:
-            subprocess.Popen([edge_path, "--remote-debugging-port=9222", url])
-        except Exception as e:
-            messagebox.showerror("Ошибка", f"Не удалось запустить Edge перед выполнением: {str(e)}")
-            return
-
-        try:
-            self.add_points(url, date, subject, selected_students)
-            messagebox.showinfo("Успех", "Баллы успешно добавлены выбранным студентам!")
-            self.start_button.config(state="disabled")  # Отключение кнопки после выполнения
-        except Exception as e:
-            messagebox.showerror("Ошибка", f"Произошла ошибка: {str(e)}")
-
-    def add_points(self, url, date, subject, selected_students):
-        """Добавляет баллы и примечания выбранным студентам на сайте."""
         edge_options = Options()
         edge_options.add_experimental_option("debuggerAddress", "127.0.0.1:9222")
         try:
@@ -353,12 +273,105 @@ class PointsAdderApp:
 
         try:
             driver.get(url)
-            # Ожидание загрузки списка группы (максимум 3 секунды)
             WebDriverWait(driver, 3).until(
                 EC.presence_of_element_located((By.CLASS_NAME, "list-unstyled"))
             )
 
-            # Обработка каждого выбранного студента
+            # Попытка найти название курса
+            try:
+                course_element = WebDriverWait(driver, 3).until(
+                    EC.presence_of_element_located((By.XPATH, "//div[contains(@class, 'col-xs-12 text-muted')]/small[contains(., 'COURSE:')]"))
+                )
+                course_text = course_element.text.strip()
+                course_name = course_text.split("COURSE:")[1].strip()
+                full_course_name = f"COURSE: {course_name}"
+                if full_course_name in subjects.values():
+                    self.subject_combobox.set(full_course_name)
+                else:
+                    self.subject_combobox.set("Выберите предмет")
+                    messagebox.showwarning("Предупреждение", f"Курс '{full_course_name}' не найден в списке.")
+            except Exception as e:
+                self.subject_combobox.set("Выберите предмет")
+                messagebox.showwarning("Предупреждение", f"Не удалось определить курс: {str(e)}")
+
+            students = driver.find_elements(By.XPATH,
+                                           "//ul[@class='list-unstyled m-t-xs m-b-xs']/li[not(contains(@class, 'archive'))]/a[@title='Открыть карточку']")
+            for i, student in enumerate(students):
+                student_name = student.text.strip()
+                student_url = student.get_attribute("href")
+                if student_name and student_url:
+                    var = tk.BooleanVar()
+                    cb = tk.Checkbutton(self.scrollable_frame, text=student_name, variable=var,
+                                        bg="white", fg="#2d3748", selectcolor="#e2e8f0")
+                    cb.grid(row=i, column=0, sticky="w", padx=5, pady=2)
+
+                    points_default = random.choices(["4", "5"], weights=[3, 1], k=1)[0]
+                    points_entry = tk.Entry(self.scrollable_frame, width=5, bg="white", fg="#2d3748",
+                                            relief="flat", highlightthickness=1, highlightbackground="#cbd5e0")
+                    points_entry.insert(0, points_default)
+                    points_entry.grid(row=i, column=1, padx=5, pady=2)
+
+                    comment_entry = tk.Entry(self.scrollable_frame, width=30, bg="white", fg="#2d3748",
+                                             relief="flat", highlightthickness=1, highlightbackground="#cbd5e0")
+                    comment_entry.grid(row=i, column=2, padx=5, pady=2)
+
+                    self.student_vars[student_name] = var
+                    self.student_urls[student_name] = student_url
+                    self.student_points[student_name] = points_entry
+                    self.student_comments[student_name] = comment_entry
+
+            if not self.student_vars:
+                messagebox.showwarning("Предупреждение", "Студенты не найдены на указанной странице.")
+            else:
+                self.start_button.config(state="normal")  # Активация кнопки "Запустить"
+                messagebox.showinfo("Успех", "Список студентов загружен.")
+
+        except Exception as e:
+            messagebox.showerror("Ошибка", f"Не удалось загрузить данные: {str(e)}")
+        finally:
+            pass
+
+    def start_process(self):
+        url = self.url_entry.get()
+        date = self.date_entry.get() or datetime.now().strftime("%d.%m.%Y")
+        subject_name = self.subject_combobox.get()
+        subject = self.get_subject_code(subject_name)
+
+        if not url or not subject or subject_name == "Выберите предмет":
+            messagebox.showerror("Ошибка", "Введите URL и выберите предмет!")
+            return
+
+        selected_students = [name for name, var in self.student_vars.items() if var.get()]
+        if not selected_students:
+            messagebox.showerror("Ошибка", "Выберите хотя бы одного студента!")
+            return
+
+        self.close_edge_processes()
+        edge_path = "C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe"
+        try:
+            subprocess.Popen([edge_path, "--remote-debugging-port=9222", url])
+        except Exception as e:
+            messagebox.showerror("Ошибка", f"Не удалось запустить Edge: {str(e)}")
+            return
+
+        try:
+            self.add_points(url, date, subject, selected_students)
+            messagebox.showinfo("Успех", "Баллы успешно добавлены!")
+            self.start_button.config(state="disabled")  # Блокировка кнопки "Запустить" после выполнения
+        except Exception as e:
+            messagebox.showerror("Ошибка", f"Произошла ошибка: {str(e)}")
+
+    def add_points(self, url, date, subject, selected_students):
+        edge_options = Options()
+        edge_options.add_experimental_option("debuggerAddress", "127.0.0.1:9222")
+        driver = webdriver.Edge(service=webdriver.edge.service.Service(EdgeChromiumDriverManager().install()), options=edge_options)
+
+        try:
+            driver.get(url)
+            WebDriverWait(driver, 3).until(
+                EC.presence_of_element_located((By.CLASS_NAME, "list-unstyled"))
+            )
+
             for student_name in selected_students:
                 student_url = self.student_urls.get(student_name)
                 points = self.student_points[student_name].get()
@@ -367,33 +380,26 @@ class PointsAdderApp:
                     continue
 
                 driver.get(student_url)
-                # Ожидание вкладки "Результаты" (максимум 2 секунды)
                 results_tab = WebDriverWait(driver, 2).until(
                     EC.element_to_be_clickable((By.XPATH, "//a[@href='#testresults']"))
                 )
                 results_tab.click()
 
-                # Попытка найти кнопку добавления результата
                 try:
                     add_result_button = WebDriverWait(driver, 2).until(
-                        EC.element_to_be_clickable((By.XPATH,
-                                                    "//a[contains(@class, 'btn btn-sm btn-w-m btn-white crm-modal-btn m-t-sm') and contains(., 'Результат')]"))
+                        EC.element_to_be_clickable((By.XPATH, "//a[contains(@class, 'btn btn-sm btn-w-m btn-white crm-modal-btn m-t-sm') and contains(., 'Результат')]"))
                     )
                     add_result_button.click()
                 except:
-                    # Альтернативная кнопка "Добавить", если первая не найдена
                     add_button = WebDriverWait(driver, 2).until(
-                        EC.element_to_be_clickable(
-                            (By.XPATH, "//a[contains(@class, 'crm-dashed-link') and text()='Добавить']"))
+                        EC.element_to_be_clickable((By.XPATH, "//a[contains(@class, 'crm-dashed-link') and text()='Добавить']"))
                     )
                     add_button.click()
 
-                # Ожидание формы ввода результата (максимум 5 секунд)
                 WebDriverWait(driver, 5).until(
                     EC.presence_of_element_located((By.ID, "testresult-date"))
                 )
 
-                # Заполнение полей формы
                 date_field = driver.find_element(By.ID, "testresult-date")
                 date_field.clear()
                 date_field.send_keys(date)
@@ -411,20 +417,17 @@ class PointsAdderApp:
                     comment_field.clear()
                     comment_field.send_keys(comment)
 
-                # Сохранение результата
                 save_button = driver.find_element(By.XPATH, "//button[@type='submit']")
                 save_button.click()
 
-                # Ожидание закрытия модального окна (максимум 2 секунды)
                 WebDriverWait(driver, 2).until(
                     EC.invisibility_of_element_located((By.CLASS_NAME, "modal-body"))
                 )
 
         finally:
-            pass  # Браузер не закрывается автоматически
+            pass
 
 if __name__ == "__main__":
-    # Запуск приложения
     root = tk.Tk()
     app = PointsAdderApp(root)
     root.mainloop()
